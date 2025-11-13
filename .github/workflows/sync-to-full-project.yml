@@ -17,7 +17,7 @@ jobs:
       - name: Checkout full_project
         uses: actions/checkout@v3
         with:
-          repository: YOUR_USERNAME/full_project  # Replace with actual repo
+          repository: buiphukhoa2002/full_project  # Replace with actual repo
           token: ${{ secrets.TARGET_REPO_TOKEN }}
           path: full_project
 
