@@ -29,8 +29,8 @@ jobs:
           # Create api folder if it doesn't exist
           mkdir -p full_project/api
           # Copy all files from project_api to full_project/api
-          # Exclude .git directory
-          rsync -av --exclude='.git' ./ full_project/api/
+          # Exclude .git directory and full_project directory
+          rsync -av --exclude='.git' --exclude='full_project' ./ full_project/api/
 
       - name: Commit changes
         run: |
