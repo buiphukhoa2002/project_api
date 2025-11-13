@@ -12,6 +12,7 @@ jobs:
       - name: Checkout project_api
         uses: actions/checkout@v3
         with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0  # Fetch all history for proper cloning
 
       - name: Checkout full_project
