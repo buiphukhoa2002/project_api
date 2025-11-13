@@ -12,27 +12,34 @@ jobs:
       - name: Checkout project_api
         uses: actions/checkout@v3
         with:
-          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
-          fetch-depth: 0  # Fetch all history for proper cloning
+          path: project_api
 
       - name: Checkout full_project
         uses: actions/checkout@v3
         with:
-          repository: buiphukhoa2002/full_project  # Replace with actual repo
+          repository: buiphukhoa2002/full_project
           token: ${{ secrets.TARGET_REPO_TOKEN }}
           path: full_project
 
       - name: Sync files to api folder
         run: |
-          # Remove old api folder content
           rm -rf full_project/api
-          # Create api folder if it doesn't exist
           mkdir -p full_project/api
-          # Copy all files from project_api to full_project/api
-          # Exclude .git directory
-          rsync -av --exclude='.git' ./ full_project/api/
+          rsync -av --exclude='.git' project_api/ full_project/api/
+
+      - name: Check changes
+        id: check_changes
+        working-directory: full_project
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Push to full_project
+        if: steps.check_changes.outputs.has_changes == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.TARGET_REPO_TOKEN }}
