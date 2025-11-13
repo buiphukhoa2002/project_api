@@ -23,7 +23,7 @@ jobs:
       - name: Push to full_project/api
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.FULL_PROJECT_TOKEN }}
+          github_token: ${{ secrets.TARGET_REPO_TOKEN }}
           repository: buiphukhoa2002/full_project
           branch: main
           directory: synced
