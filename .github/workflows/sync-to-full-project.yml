@@ -1,29 +1,40 @@
-name: Sync project_api to full_project/api
+name: Sync to full_project
 
 on:
   push:
     branches:
-      - main  # Trigger only when main branch updates
+      - main
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout project_api code
-        uses: actions/checkout@v4
+      - name: Checkout project_api
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Ensure full commit history
+          fetch-depth: 0  # Fetch all history for proper cloning
 
-      - name: Prepare files
+      - name: Checkout full_project
+        uses: actions/checkout@v3
+        with:
+          repository: YOUR_USERNAME/full_project  # Replace with actual repo
+          token: ${{ secrets.TARGET_REPO_TOKEN }}
+          path: full_project
+
+      - name: Sync files to api folder
         run: |
-          mkdir -p synced/api
-          rsync -av --exclude='.git' --exclude='.github' ./ synced/api/
+          # Remove old api folder content
+          rm -rf full_project/api
+          # Create api folder if it doesn't exist
+          mkdir -p full_project/api
+          # Copy all files from project_api to full_project/api
+          # Exclude .git directory
+          rsync -av --exclude='.git' ./ full_project/api/
 
-      - name: Push to full_project/api
+      - name: Push to full_project
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.TARGET_REPO_TOKEN }}
+          directory: full_project
           repository: buiphukhoa2002/full_project
           branch: main
-          directory: synced
