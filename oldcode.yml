@@ -1,0 +1,52 @@
+name: Sync to Full Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout project_api
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: project_api
+      
+      - name: Checkout full_project
+        uses: actions/checkout@v4
+        with:
+          repository: buiphukhoa2002/full_project
+          token: ${{ secrets.FULL_PROJECT_TOKEN }}
+          fetch-depth: 0
+          path: full_project
+      
+      - name: Sync changes to api folder
+        run: |
+          # Remove existing api folder contents (except .git if any)
+          rm -rf full_project/api/*
+          
+          # Copy all files from project_api to full_project/api
+          cp -r project_api/* full_project/api/
+          
+          # Copy hidden files (like .gitignore) but not .git
+          cp -r project_api/.[!.]* full_project/api/ 2>/dev/null || true
+      
+      - name: Commit and push changes
+        working-directory: full_project
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          git add api/
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Sync API from project_api@${{ github.sha }}"
+            git push origin main
+          fi
